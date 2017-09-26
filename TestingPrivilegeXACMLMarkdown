@@ -1,0 +1,85 @@
+PrivilegeXACML and Gums testing
+===============================
+
+<span class="twiki-macro TOC" depth="2"></span>
+
+---\# About This Document
+
+<span class="twiki-macro ICON">hand</span> This document is intended for OSG Software/Release teams to gather information on testing privilege-xacml/gums releases.
+
+---\# About PrivilegeXACML
+
+PrivilegeXACML is an OSG specific JAR.
+
+---\# Requirements
+
+---\#\# GUMS
+
+You need a gums installation. See
+
+[Gums Installation](https://twiki.grid.iu.edu/bin/view/Documentation/Release3/InstallGums)
+
+---\#\# A host with glexec installation
+
+[Glexec Installation](https://twiki.grid.iu.edu/bin/view/Documentation/Release3/InstallGlexec)
+
+---\# Testing Instructions
+
+---\#\# In the gums server Perform the following actions on the gums web interface, your DN must have admin privileges. See [GUMS documentation](https://twiki.grid.iu.edu/bin/view/Documentation/Release3/InstallGums) for more information: ---\#\#\# Add an account mapper with the following parameters: |**name**|**type**|**persistence factory**| |test|manual|mysql|
+
+---\#\#\# Add a user group name |**group name**|**type**|**GUMS Access**| |test|manual|Read Self|
+
+---\#\#\# Add a group to account mapping called
+
+| name | user group | account mapper |
+|:-----|:-----------|:---------------|
+| test | test       | test           |
+
+---\#\#\# Add a host to group mapping
+
+| Hosts             | Group to Account Mapping |
+|:------------------|:-------------------------|
+| ***/?**.fnal.gov* | test                     |
+
+---\#\#\# In manual account mapping click add, and add the following:
+
+| User Group | DN       | FQAN |
+|:-----------|:---------|:-----|
+| test       | *yourDN* | \*   |
+
+---\#\#\# Install privilege-xacml
+
+``` rootscreen
+%UCL_PROMPT_ROOT% yum install privilege-xacml 
+```
+
+---\#\#\# Replace the privilege xacml
+
+Replace */var/lib/tomcat\[5|6\]/webapps/gums/WEB-INF/lib/privilege-xacml-X.X.X.jar* with the version you want to test:
+
+``` rootscreen
+%UCL_PROMPT_ROOT%cp /usr/share/java/privilege-xacml.jar  /var/lib/tomcat[5|6]/webapps/gums/WEB-INF/lib/privilege-xacml-X.X.X.jar
+```
+
+---\#\# In the Glexec node installation
+
+---\#\#\# Configure your glexec node
+
+Configure the node so it points to your gums installation following the [Glexec Config instrucctions](https://twiki.grid.iu.edu/bin/view/Documentation/Release3/InstallGlexec#8_Configuring_glexec)
+
+---\#\#\# Add user test to the glexec node
+
+``` rootscreen
+%UCL_PROMPT_ROOT%useradd test
+```
+
+---\#\#\# Test glexc
+
+``` screen
+%UCL_PROMPT% voms-proxy-init
+%UCL_PROMPT% export GLEXEC_CLIENT_CERT=/tmp/x509up_u%RED%NNN%ENDCOLOR%
+%UCL_PROMPT% /usr/sbin/glexec /usr/bin/id
+uid=13160(fnalgrid) gid=9767(fnalgrid) groups=65000(glexec00)
+```
+
+-- Main.EdgarFajardo - 02 Jun 2014
